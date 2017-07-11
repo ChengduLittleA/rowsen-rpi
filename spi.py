@@ -81,6 +81,8 @@ BITS = 8
 SPEED = 50000
 DELAY = 10
 
+import time
+
 class AD770X():
     def __init__(self,bus=0,device=0,channel=CHN_AIN1) :        
         self.spi = spidev.SpiDev()
@@ -90,9 +92,10 @@ class AD770X():
         self.spi.bits_per_word = BITS        
         self.reset()
         self.initChannel(CHN_AIN1)
+        time.sleep(0.2)
         self.initChannel(CHN_AIN2)
 
-    def initChannel(self,channel,clkDivider=CLK_DIV_1,polarity=BIPOLAR,gain=GAIN_1,updRate=UPDATE_RATE_25) :
+    def initChannel(self,channel,clkDivider=CLK_DIV_1,polarity=BIPOLAR,gain=GAIN_64,updRate=UPDATE_RATE_25) :
         self.setNextOperation(REG_CLOCK, channel, 0)
         self.writeClockRegister(0, clkDivider, updRate)
 

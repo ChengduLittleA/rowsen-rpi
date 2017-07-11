@@ -5,6 +5,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import spi
 
+GLOBAL_Zero1=0
+GLOBAL_Zero2=0
+
 class MyTimer(QWidget):
     def __init__(self, parent = None):
         super(MyTimer, self).__init__(parent)      
@@ -12,13 +15,13 @@ class MyTimer(QWidget):
         self.setWindowTitle("QTimerDemo")
         
         self.lcd1 = QLCDNumber()      
-        self.lcd1.setDigitCount(10)      
+        self.lcd1.setDigitCount(6)      
         self.lcd1.setMode(QLCDNumber.Dec)
         self.lcd1.setSegmentStyle(QLCDNumber.Flat)
         self.lcd1.display(0)
 
         self.lcd2 = QLCDNumber()      
-        self.lcd2.setDigitCount(10)      
+        self.lcd2.setDigitCount(6)      
         self.lcd2.setMode(QLCDNumber.Dec)
         self.lcd2.setSegmentStyle(QLCDNumber.Flat)
         self.lcd2.display(0)
@@ -35,12 +38,28 @@ class MyTimer(QWidget):
         self.timer.timeout.connect(self.onTimerOut)
 
         self.rw = spi.AD770X()
+
+        self.ZeroOut()
+    
+    def ZeroOut(self):
+        time.sleep(1)
+        GLOBAL_Zero1 = self.rw.readADResultRaw(spi.CHN_AIN1)
+        time.sleep(0.1)
+        GLOBAL_Zero2 = self.rw.readADResultRaw(spi.CHN_AIN2)
         
     def onTimerOut(self):
         a = self.rw.readADResultRaw(spi.CHN_AIN1)
+        a-=GLOBAL_Zero1
+        a/=134.21
+
+        time.sleep(0.1)
+
         b = self.rw.readADResultRaw(spi.CHN_AIN2)
-        self.lcd1.display(str(a))
-        self.lcd2.display(str(b))
+        b-=GLOBAL_Zero2
+        b/=134.21
+        
+        self.lcd1.display("%.1f"%a)
+        self.lcd2.display("%.1f"%b)
 
 
         
