@@ -82,13 +82,15 @@ SPEED = 50000
 DELAY = 10
 
 class AD770X():
-    def __init__(self,bus=0,device=0) :        
+    def __init__(self,bus=0,device=0,channel=CHN_AIN1) :        
         self.spi = spidev.SpiDev()
         self.spi.open(bus, device)        
         self.spi.max_speed_hz = SPEED
         self.spi.mode = 0b11
         self.spi.bits_per_word = BITS        
         self.reset()
+        self.initChannel(CHN_AIN1)
+        self.initChannel(CHN_AIN2)
 
     def initChannel(self,channel,clkDivider=CLK_DIV_1,polarity=BIPOLAR,gain=GAIN_1,updRate=UPDATE_RATE_25) :
         self.setNextOperation(REG_CLOCK, channel, 0)
@@ -154,15 +156,6 @@ class AD770X():
         for i in range(100) :
             self.spi.xfer([0xff])        
 
-def main(args):
-    import time
-    ad7705 = AD770X()    
-    ad7705.initChannel(CHN_AIN1)
-    while True :
-        print ad7705.readADResultRaw(CHN_AIN1) 
-        time.sleep (0.5)
 
-if __name__ == '__main__':
-    import sys
-    sys.exit(main(sys.argv))
+
 
